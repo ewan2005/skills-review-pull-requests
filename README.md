@@ -41,6 +41,42 @@ Let's get started by opening a pull request.
 8. Click **Create pull request**.
 9. Wait about 20 seconds then refresh this page (the one you're following instructions from). [GitHub Actions](https://docs.github.com/en/actions) will automatically update to the next step.
 
+## Auto-commit quotidien (Windows)
+
+Si vous voulez que ce dépôt fasse un commit automatique chaque jour sans exécuter de commandes manuellement, vous pouvez utiliser le Planificateur de tâches Windows (Task Scheduler) pour lancer un script PowerShell quotidiennement.
+
+1) Script fourni
+
+- J'ai ajouté un script: `scripts/random_commit.ps1` qui ajoute une ligne dans le fichier `.autocommit_log` et fait un `git commit`. Par défaut il crée 1 commit par exécution.
+
+2) Exemple: créer une tâche qui s'exécute chaque jour à 10:00
+
+Ouvrez PowerShell en administrateur (ou une session utilisateur qui a accès au dépôt) et exécutez la commande suivante en adaptant le chemin:
+
+```powershell
+schtasks /Create /SC DAILY /TN "AutoCommit" /TR "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"D:\\ITU_S5\\skills-review-pull-requests\\scripts\\random_commit.ps1\" -CommitsPerRun 1 -RepoPath \"D:\\ITU_S5\\skills-review-pull-requests\" -Push" /ST 10:00
+```
+
+Remarques:
+- Changez `/ST 10:00` pour l'heure que vous souhaitez.
+- L'option `-Push` pousse vers le remote après le commit si vous voulez que les commits apparaissent surGitHub automatiquement. Assurez-vous que les informations d'identification Git sont configurées pour l'utilisateur qui exécute la tâche (par exemple via des credentials stockés ou SSH agent disponible).
+
+3) Alternatives et randomisation
+
+- Si vous voulez que l'heure soit aléatoire chaque jour, le Planificateur de tâches ne propose pas directement une option "aléatoire". Deux approches possibles:
+  - Créer une tâche qui s'exécute plusieurs fois par jour et faire en sorte que le script effectue seulement 1 commit par jour (par ex. en vérifiant un fichier `.last_autocommit_date`).
+  - Laisser la tâche s'exécuter une fois par jour à une heure fixe (plus simple et fiable).
+
+4) Dépannage rapide
+
+- Si la tâche ne crée pas de commit, vérifiez que la tâche s'exécute avec le bon `RepoPath` et que l'utilisateur a les droits Git/credential nécessaires.
+- Testez manuellement le script depuis PowerShell:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "D:\ITU_S5\skills-review-pull-requests\scripts\random_commit.ps1" -CommitsPerRun 1 -RepoPath "D:\ITU_S5\skills-review-pull-requests"
+```
+
+
 <footer>
 
 <!--
