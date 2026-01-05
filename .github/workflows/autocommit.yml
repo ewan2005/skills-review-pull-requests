@@ -1,6 +1,7 @@
 name: Auto Commit Daily
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 0 * * *' # runs once per day at 00:00 UTC (change as needed)
 
